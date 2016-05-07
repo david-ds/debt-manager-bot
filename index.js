@@ -117,12 +117,20 @@ app.post('/', (req, res) => {
             transactions.addAllParticipants(group.currentTransaction, group.members, (err) => {
               if(err) {throw "unable to add all participants"}
               bot.everyoneHadParticipated(message.chat, group.members, (err) => {
-                if(err) { throw "unable to say everybody partipated"};
+                if(err) { throw "unable to say everybody partipated";}
                 return res.send();
               })
             });
           }
           else {
+            var participants = message.text.split(" ");
+            transactions.addParticipants(group.currentTransaction, group.members, participants, (err, transaction) => {
+              if(err) { throw "unable to add some participants ";}
+              bot.participantsAdded(message.chat, transaction, (err) => {
+                if(err) { throw "unable to say some participants added";}
+                return res.send();
+              })
+            });
             return res.send();
           }
         }

@@ -72,8 +72,17 @@ module.exports = (telegramApi) => {
     var text = "Ok, I added ";
     groupMembers.forEach((member) => { text += member.firstName + " " + member.lastName.substr(0,1) + ","});
     text = text.slice(0,-1) + ".";
-    telegramApi.sendMessage(chat.id, text.slice(0,-1), {}, callback);
+    telegramApi.sendMessage(chat.id, text, {}, callback);
   }
+
+  response.participantsAdded = (chat, transaction, callback) => {
+    var text = "Ok. In my list I have ";
+    console.log(transaction);
+    transaction.participants.forEach((participant) => {text += participant.user.firstName + " " + participant.user.lastName + ", "});
+    text = text.slice(0,-2) + ".\n";
+    text += "Did I forgot anyone ? If no, say stop.";
+    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
+  };
 
   return response;
 }
