@@ -22,5 +22,11 @@ module.exports = () => {
     });
   }
 
+  response.setName = (transactionId, name, callback) => {
+    Transaction.update({_id: transactionId}, {name: name}, (err, transaction) => {
+      callback(err);
+    })
+  }
+
   return response;
 }

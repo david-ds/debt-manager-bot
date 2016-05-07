@@ -56,6 +56,18 @@ app.post('/', (req, res) => {
             return res.send();
           });
         }
+        else if(group.currentAction.actionType === "name_transaction") {
+          transactions.setName(group.currentTransaction, message.text, (err) => {
+            if(err) { console.error('unable to rename transaction'); }
+            bot.askForFirstCreditor(message.chat, message.text, (err) => {
+              group.currentAction.messageQuestionId = message.id;
+              group.currentAction.actionType = "new_creditor";
+              group.save();
+              return res.send();
+            })
+          })
+        }
+
       }
 
       if(message.text.indexOf("/start") === 0) {
@@ -69,7 +81,6 @@ app.post('/', (req, res) => {
         });
       }
       if(message.text.indexOf("/newtransaction") === 0) {
-        console.log('time to create new transaction');
         transactions.createEmpty(message.from, group, (err) => {
           if(err) { console.error('cannot create transaction');}
           bot.createdEmptyTransaction(message.chat, (err) => {
@@ -77,7 +88,7 @@ app.post('/', (req, res) => {
             group.currentAction.actionType = "name_transaction";
             group.save();
             return res.send();
-          })
+          });
         });
       }
       else {

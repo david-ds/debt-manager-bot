@@ -42,5 +42,11 @@ module.exports = (telegramApi) => {
     telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
   }
 
+  response.askForFirstCreditor = (chat, transactionName, callback) => {
+    var text = "Alright. Who paid for " + transactionName + " ?\n";
+    text += "Type for example : @BarackObama 5.0";
+    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
+  }
+
   return response;
 }
