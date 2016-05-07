@@ -9,6 +9,8 @@ services:
     depends_on:
       - mongo
     working_dir: /usr/src/app
+    command: node index.js
+    env_file: secrets.env
   mongo:
     image: mongo:3
     volumes:
