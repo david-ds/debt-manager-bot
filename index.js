@@ -7,6 +7,7 @@ var telegramApi = require('./telegram')();
 var bot = require('./bot')(telegramApi);
 
 var users = require('./users')();
+var transactions = require('./transactions')();
 
 
 //express configuration
@@ -65,6 +66,18 @@ app.post('/', (req, res) => {
           group.currentAction.actionType = "rename";
           group.save();
           return res.send();
+        });
+      }
+      if(message.text.indexOf("/newtransaction") === 0) {
+        console.log('time to create new transaction');
+        transactions.createEmpty(message.from, group, (err) => {
+          if(err) { console.error('cannot create transaction');}
+          bot.createdEmptyTransaction(message.chat, (err) => {
+            group.currentAction.messageQuestionId = message.id;
+            group.currentAction.actionType = "name_transaction";
+            group.save();
+            return res.send();
+          })
         });
       }
       else {

@@ -37,6 +37,9 @@ module.exports = (telegramApi) => {
     telegramApi.sendMessage(chat.id, text, {}, callback);
   };
 
+  response.createdEmptyTransaction = (chat, callback) => {
+    var text = "Yesss ! I'm on it. First, give the transaction a name. Something like \"pizzas\"";
+    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
   }
 
   return response;
