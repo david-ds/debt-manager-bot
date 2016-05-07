@@ -10,7 +10,7 @@ telegramApi.createConnection(process.env.TELEGRAM_TOKEN, process.env.DEBTMANAGER
 });
 
 app.get('/', (req, res) => {
-  return res.send('coucou');
+  return res.send('hello');
 });
 
 app.listen(3000, () => {
