@@ -41,7 +41,7 @@ module.exports = () => {
 
   response.addAllParticipants = (transactionId, groupMembers, callback) => {
     async.eachSeries(groupMembers, (member, callb) => {
-      Transaction.update({_id: transactionId}, {$push: {participants: member}}, callb);
+      Transaction.update({_id: transactionId}, {$push: {participants: {user: member}}}, callb);
     }, callback);
 
   };
@@ -63,6 +63,10 @@ module.exports = () => {
 
   });
 };
+
+response.getTransaction = (transactionId, callback) => {
+  Transaction.findOne({_id: transactionId}, callback);
+}
 
   return response;
 }

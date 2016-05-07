@@ -84,5 +84,35 @@ module.exports = (telegramApi) => {
     telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
   };
 
+  response.transactionSummary = (chat, transaction, callback) => {
+    var text = "Ok, I think I've got everything I need. Let's sum up this :\n"
+    text += transaction.creator.firstName + " " + transaction.creator.lastName.substr(0,1) + " created " + transaction.name + "\n";
+    text += "\nThe creditors are :\n";
+    var totalAmount = 0;
+    transaction.creditors.forEach((creditor) => {
+      text += creditor.user.firstName + " " + creditor.user.lastName + " (" + creditor.amount + ")\n";
+      totalAmount += creditor.amount});
+
+    text += "\nThe participants are :\n";
+    transaction.participants.forEach((participant) => {
+      text += participant.user.firstName + " " + participant.user.lastName + "\n";
+    });
+    text += "\n";
+    text += "Do you confirm it ?";
+
+
+    var keyboard = [["Yes", "No"]];
+
+    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, "one_time_keyboard": true}, callback);
+  };
+
+
+  response.endTransaction = (chat, callback) => {
+    telegramApi.sendMessage(chat.id, "Ok, well done ! Type /balance to pay your debts or /transactions to see the last transactions", {}, callback);
+  }
+
+  response.problemTransaction = (chat, callback) => {
+    telegramApi.sendMessage(chat.id, "Well... That's a problem because I can't edit a transaction for now..", {}, callback);
+  }
   return response;
 }

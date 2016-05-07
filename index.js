@@ -118,9 +118,30 @@ app.post('/', (req, res) => {
               if(err) {throw "unable to add all participants"}
               bot.everyoneHadParticipated(message.chat, group.members, (err) => {
                 if(err) { throw "unable to say everybody partipated";}
-                return res.send();
+                group.currentAction.actionType = "confirmation_transaction";
+                group.currentAction.messageQuestionId = message.id;
+                transactions.getTransaction(group.currentTransaction, (err, transaction) => {
+                  console.log('couocu');
+                  bot.transactionSummary(message.chat, transaction, (err) => {
+                    if(err) { throw "unable to sum up the transaction";}
+                    return res.send();
+                  });
+                });
               })
             });
+          }
+          else if(message.text === "stop") {
+            group.currentAction.messageQuestionId = message.id;
+            group.currentAction.actionType = "confirmation_transaction";
+            group.save();
+            transactions.getTransaction(group.currentTransaction, (err, transaction) => {
+              console.log('couocu');
+              bot.transactionSummary(message.chat, transaction, (err) => {
+                if(err) { throw "unable to sum up the transaction";}
+                return res.send();
+              });
+            });
+
           }
           else {
             var participants = message.text.split(" ");
@@ -132,6 +153,26 @@ app.post('/', (req, res) => {
               })
             });
             return res.send();
+          }
+        }
+        else if(group.currentAction.actionType === "confirmation_transaction") {
+          if(message.text === "Yes") {
+            bot.endTransaction(message.chat, (err) => {
+              if(err) { throw "unable to say end of transaction"};
+              group.currentAction.actionType = "";
+              group.currentAction.messageQuestionId = 0;
+              group.currentTransaction = null;
+              group.save();
+            });
+          }
+          else {
+            bot.problemTransaction(message.chat, (err) => {
+              if(err) { throw "unable to say end of transaction"};
+              group.currentAction.actionType = "";
+              group.currentAction.messageQuestionId = 0;
+              group.currentTransaction = null;
+              group.save();
+            })
           }
         }
       }
