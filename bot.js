@@ -3,6 +3,7 @@
 module.exports = (telegramApi) => {
 
   var response = {};
+  var jokeAboutGroupName = "One Direction Fans"
 
   response.sayHello = function(to, callback) {
     var text = "Hello There ! Nice to meet you " + to.first_name + ".\n";
@@ -18,10 +19,24 @@ module.exports = (telegramApi) => {
     text += "I'm DebtManagerBot. I will help you manage your finance in this group.\n";
     text += "I will register you all as soon as you speak here.\n"
     text += "So, who's the first ?\n"
-    text += "Oooh, and what if you give a name to this group ? Use the /rename command.\n"
-    text += "For example.. /rename camping 2016"
+    text += "Oooh, and what if you give a name to this group ? \n"
+    text += "For example.. Let me guess.. " + jokeAboutGroupName
 
-    telegramApi.sendMessage(to.id, text, {}, callback);
+    telegramApi.sendMessage(to.id, text, {"force_reply": true}, callback);
+  }
+
+  response.renamedGroup = (chat, name, callback) => {
+    var text = "";
+    if(name === jokeAboutGroupName) {
+      text = "Oh you listen to me <3 Your name is now " + jokeAboutGroupName;
+    }
+    else {
+        text = "Ok, you're not really fun.. I will call you " + name
+    }
+    text += "\n\nRemember : you type /newtransaction to create a new transaction";
+    telegramApi.sendMessage(chat.id, text, {}, callback);
+  };
+
   }
 
   return response;

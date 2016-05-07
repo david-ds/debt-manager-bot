@@ -44,9 +44,26 @@ app.post('/', (req, res) => {
     users.createUserInGroup(message.from, group, (err) => {
       if(err) { console.error('unable to add user to the group');}
 
-      if(message.text === "/start") {
+      if(message.reply_to_message && message.reply_to_message.id == group.currentAction.messageQuestionId) {
+        if(group.currentAction.actionType === "rename") {
+          group.name = message.text;
+          users.resetAction(group);
+          group.save();
+
+          bot.renamedGroup(message.chat, message.text, (err) => {
+            if(err) { console.error('cannot rename group :/');}
+            return res.send();
+          });
+        }
+      }
+
+      if(message.text.indexOf("/start") === 0) {
         bot.sayHelloToChannel(message.chat, (err) => {
           if(err) { console.error('cannot say hello to the group');}
+          //awaiting for a new name for the group
+          group.currentAction.messageQuestionId = message.id;
+          group.currentAction.actionType = "rename";
+          group.save();
           return res.send();
         });
       }

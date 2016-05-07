@@ -14,7 +14,11 @@ var groupSchema = new mongoose.Schema({
     telegramId: Number
   }],
   lastDebtPaidDate: {type: Date, default: Date.now},
-  currentTransaction: mongoose.Schema.Types.ObjectId
+  currentTransaction: mongoose.Schema.Types.ObjectId,
+  currentAction: {
+    messageQuestionId: Number,
+    actionType: String
+  }
 });
 
 groupSchema.plugin(findOneOrCreate);

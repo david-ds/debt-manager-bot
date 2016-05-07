@@ -36,8 +36,13 @@ module.exports = () => {
         callback(err);
       })
     }
-    else { callback(1);}
+    else { callback(0);}
   };
+
+  response.resetAction =(group) => {
+    group.currentAction.actionType = "";
+    group.currentAction.messageQuestionId = 0;
+  }
 
   return response;
 };
