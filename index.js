@@ -20,10 +20,19 @@ app.post('/', (req, res) => {
   var message = req.body.message;
   console.log('recieved message : ' + message.text);
 
+  var privateMessage = message.chat.type === "private";
 
-  if(message.text == "/start") {
+
+  if(message.text === "/start" && privateMessage) {
     bot.sayHello(message.from, (err) => {
-      if(err) { console.error('cannot say hello');}
+      if(err) { console.error('cannot say hello personally');}
+      return res.send();
+    });
+  }
+
+  else if(message.text === "/start" && !privateMessage) {
+    bot.sayHelloToChannel(message.chat, (err) => {
+      if(err) { console.error('cannot say hello to the group');}
       return res.send();
     });
   }
