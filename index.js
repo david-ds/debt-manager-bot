@@ -6,6 +6,8 @@ var telegramApi = require('./telegram')();
 
 var bot = require('./bot')(telegramApi);
 
+var users = require('./users')();
+
 
 //express configuration
 app.use(bodyParser.json());
@@ -22,7 +24,6 @@ app.post('/', (req, res) => {
 
   var privateMessage = message.chat.type === "private";
 
-
   if(message.text === "/start" && privateMessage) {
     bot.sayHello(message.from, (err) => {
       if(err) { console.error('cannot say hello personally');}
@@ -30,16 +31,28 @@ app.post('/', (req, res) => {
     });
   }
 
-  else if(message.text === "/start" && !privateMessage) {
-    bot.sayHelloToChannel(message.chat, (err) => {
-      if(err) { console.error('cannot say hello to the group');}
-      return res.send();
-    });
-  }
-
-  else {
+  if(privateMessage) {
     return res.send();
   }
+
+  //Get the current group
+  users.findOrCreateGroup(message.chat, (group) => {
+    //register the user if not already done
+    users.createUserInGroup(message.from, group, (err) => {
+      if(err) { console.error('unable to add user to the group');}
+
+      if(message.text === "/start") {
+        bot.sayHelloToChannel(message.chat, (err) => {
+          if(err) { console.error('cannot say hello to the group');}
+          return res.send();
+        });
+      }
+      else {
+        return res.send();
+      }
+    });
+  });
+
 
 });
 
