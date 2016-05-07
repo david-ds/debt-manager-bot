@@ -1,7 +1,12 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
 
 var telegramApi = require('./telegram')();
+
+
+//express configuration
+app.use(bodyParser.json());
 
 //telegram connection
 telegramApi.createConnection(process.env.TELEGRAM_TOKEN, process.env.DEBTMANAGERBOT_URL, (err) => {
@@ -9,8 +14,15 @@ telegramApi.createConnection(process.env.TELEGRAM_TOKEN, process.env.DEBTMANAGER
   console.log('webhook to telegram set');
 });
 
-app.get('/', (req, res) => {
-  return res.send('hello');
+app.post('/', (req, res) => {
+  console.log('recieved message');
+  var message = req.body.message;
+  telegramApi.sendMessage(message.from.id, message.text, [], (err) => {
+    if(err) { console.error("error while sending message"); }
+    return res.send();
+
+  })
+
 });
 
 app.listen(3000, () => {
