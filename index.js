@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 
 var telegramApi = require('./telegram')();
 
+var bot = require('./bot')(telegramApi);
+
 
 //express configuration
 app.use(bodyParser.json());
@@ -15,13 +17,20 @@ telegramApi.createConnection(process.env.TELEGRAM_TOKEN, process.env.DEBTMANAGER
 });
 
 app.post('/', (req, res) => {
-  console.log('recieved message');
   var message = req.body.message;
-  telegramApi.sendMessage(message.from.id, message.text, [], (err) => {
-    if(err) { console.error("error while sending message"); }
-    return res.send();
+  console.log('recieved message : ' + message.text);
 
-  })
+
+  if(message.text == "/start") {
+    bot.sayHello(message.from, (err) => {
+      if(err) { console.error('cannot say hello');}
+      return res.send();
+    });
+  }
+
+  else {
+    return res.send();
+  }
 
 });
 

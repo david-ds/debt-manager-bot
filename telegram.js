@@ -25,7 +25,8 @@ module.exports = () => {
   response.sendMessage = (to, text, keyboard, callback) => {
     var data = {
       chat_id: to,
-      text: text
+      text: text,
+      reply_markup: keyboard
     };
     this.sendRequest('sendMessage', data, (err, response, body) => {
       callback(err);
