@@ -28,5 +28,13 @@ module.exports = () => {
     })
   }
 
+  response.addCreditor = (transactionId, creditor, amount, callback) => {
+    var newCreditor = {
+      user: creditor,
+      amount: amount
+    };
+    Transaction.findOneAndUpdate({_id: transactionId}, {$push: {creditors: newCreditor}}, {new: true}, callback);
+  }
+
   return response;
 }

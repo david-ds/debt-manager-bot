@@ -68,6 +68,47 @@ app.post('/', (req, res) => {
           })
         }
 
+        else if(group.currentAction.actionType === "new_creditor") {
+          if(message.text === "stop") {
+            group.currentAction.messageQuestionId = message.id;
+            group.currentAction.actionType = "new_participant";
+            group.save();
+            bot.askForFirstParticipant(message.chat, (err) => {
+              if(err) { throw "unable to ask for first participant";}
+              return res.send();
+            });
+          }
+          else {
+            var usernameAndAmount = message.text.split(" ");
+            var username = "", amount = 0;
+            var user = {};
+            var errorParsing = false;
+            try {
+              username = usernameAndAmount[0];
+              amount = parseFloat(usernameAndAmount[1]);
+              if(isNaN(amount)) { throw "Not a valid amount"; }
+              user = _.find(group.members, {username: username.substr(1)});
+              if(!user) { throw "Invalid user";}
+            }
+            catch(e) {
+                errorParsing = true;
+            }
+            if(errorParsing) {
+              bot.sayInvalidCreditor(message.chat, (err) => {
+                if(err) { throw "Unable to say invalid creditor"};
+                return res.send();
+              });
+            }
+            else {
+              transactions.addCreditor(group.currentTransaction, user, amount, (err, transaction) => {
+                bot.askForCreditor(message.chat, transaction, (err) => {
+                  if(err) { throw "Unable to ask for new creditor";}
+                  return res.send();
+                })
+              });
+            }
+          }
+        }
       }
 
       if(message.text.indexOf("/start") === 0) {

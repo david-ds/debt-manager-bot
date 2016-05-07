@@ -48,5 +48,25 @@ module.exports = (telegramApi) => {
     telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
   }
 
+  response.sayInvalidCreditor = (chat, callback) => {
+    var text = "Sorry :/ I don't get it. Please tell me the new creditors in the format '@pseudo 10.0'";
+    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
+  }
+
+  response.askForCreditor = (chat, transaction, callback) => {
+    var text = "Ok, I get it. For now I have :\n";
+    transaction.creditors.forEach((creditor) => {
+      text += creditor.user.firstName + " paid " + creditor.amount + "€\n"
+    });
+    text += "Who else ? When you're done, say stop";
+
+    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
+  }
+
+  response.askForFirstParticipant = (chat, callback) => {
+    var text = "Alright. Now, who participated in ? You can tell me the names this way : @BarackObama @QueenElisabeth or anwser \"everybody\"";
+    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
+  }
+
   return response;
 }
