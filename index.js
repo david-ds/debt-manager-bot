@@ -20,6 +20,9 @@ telegramApi.createConnection(process.env.TELEGRAM_TOKEN, process.env.DEBTMANAGER
 
 app.post('/', (req, res) => {
   var message = req.body.message;
+  if(!message.text)  {
+    return res.send();
+  }
   console.log('recieved message : ' + message.text);
 
   var privateMessage = message.chat.type === "private";
