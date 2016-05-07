@@ -1,5 +1,7 @@
 var Transaction = require('./model').Transaction;
 
+var async = require('async');
+
 module.exports = () => {
 
   var response = {};
@@ -35,6 +37,13 @@ module.exports = () => {
     };
     Transaction.findOneAndUpdate({_id: transactionId}, {$push: {creditors: newCreditor}}, {new: true}, callback);
   }
+
+  response.addAllParticipants = (transactionId, groupMembers, callback) => {
+    async.eachSeries(groupMembers, (member, callb) => {
+      Transaction.update({_id: transactionId}, {$push: {participants: member}}, callb);
+    }, callback);
+
+  };
 
   return response;
 }

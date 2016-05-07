@@ -9,6 +9,8 @@ var bot = require('./bot')(telegramApi);
 var users = require('./users')();
 var transactions = require('./transactions')();
 
+var _ = require('underscore');
+
 
 //express configuration
 app.use(bodyParser.json());
@@ -107,6 +109,21 @@ app.post('/', (req, res) => {
                 })
               });
             }
+          }
+        }
+        else if(group.currentAction.actionType === "new_participant") {
+
+          if(message.text === "everybody") {
+            transactions.addAllParticipants(group.currentTransaction, group.members, (err) => {
+              if(err) {throw "unable to add all participants"}
+              bot.everyoneHadParticipated(message.chat, group.members, (err) => {
+                if(err) { throw "unable to say everybody partipated"};
+                return res.send();
+              })
+            });
+          }
+          else {
+            return res.send();
           }
         }
       }

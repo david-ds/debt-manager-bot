@@ -68,5 +68,12 @@ module.exports = (telegramApi) => {
     telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
   }
 
+  response.everyoneHadParticipated = (chat, groupMembers, callback) => {
+    var text = "Ok, I added ";
+    groupMembers.forEach((member) => { text += member.firstName + " " + member.lastName.substr(0,1) + ","});
+    text = text.slice(0,-1) + ".";
+    telegramApi.sendMessage(chat.id, text.slice(0,-1), {}, callback);
+  }
+
   return response;
 }
