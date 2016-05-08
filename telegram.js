@@ -16,7 +16,7 @@ module.exports = () => {
     if(!urlWebhook) { throw "You must provide a webhook url"};
 
     this.telegramApi = telegramApiEndpoint + token;
-    var data = {url: urlWebhook};
+    var data = {url: 'https://' + urlWebhook};
     this.sendRequest('setWebhook', data, (err, response, body) => {
       callback(err);
       console.log('telegram connection to ' + urlWebhook + ' : ', body);
