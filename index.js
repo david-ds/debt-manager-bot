@@ -17,9 +17,7 @@ app.use(bodyParser.json());
 
 //telegram connection
 var selfUrl = process.env.OPENSHIFT_APP_DNS || process.env.DEBTMANAGERBOT_URL;
-if(process.env.OPENSHIFT_NODEJS_PORT) {
-  selfUrl += ":" + process.env.OPENSHIFT_NODEJS_PORT
-}
+
 telegramApi.createConnection(process.env.TELEGRAM_TOKEN, selfUrl, (err) => {
   if(err) { throw "Unable to set webhook"}
   console.log('webhook to telegram set');
