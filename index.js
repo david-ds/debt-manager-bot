@@ -122,6 +122,7 @@ app.post('/', (req, res) => {
                 if(err) { throw "unable to say everybody partipated";}
                 group.currentAction.actionType = "confirmation_transaction";
                 group.currentAction.messageQuestionId = message.id;
+                group.save();
                 transactions.getTransaction(group.currentTransaction, (err, transaction) => {
                   bot.transactionSummary(message.chat, transaction, (err) => {
                     if(err) { throw "unable to sum up the transaction";}
