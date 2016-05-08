@@ -98,6 +98,14 @@ response.balance = (group, callback) => {
       });
     });
 
+    var initialSituations = [];
+    _.each(members, (member) => {
+      initialSituations.push({
+        user: member,
+        amount: situations[member.telegramId]
+      });
+    });
+    
     _.each(situations, (amount, telegramId) => {
       if(amount >= 0) {
         positiveMembers.push({telegramId: telegramId, amount: amount});
@@ -109,7 +117,7 @@ response.balance = (group, callback) => {
     positiveMembers = _.sortBy(positiveMembers, (member) => {return -member.amount;});
     negativeMembers = _.sortBy(negativeMembers, (member) => {return -member.amount;});
 
-    var initialSituations = _.map(situations, (situation) => {return situation;});
+
 
     var whatToDo = [];
 
@@ -125,7 +133,7 @@ response.balance = (group, callback) => {
       });
     });
 
-    callback(null, whatToDo);
+    callback(null, whatToDo, initialSituations, members);
   });
 }
 

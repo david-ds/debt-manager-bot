@@ -211,9 +211,9 @@ app.post('/', (req, res) => {
         });
       }
       else if(message.text.indexOf("/balance") === 0) {
-        transactions.balance(group, (err, balance) => {
+        transactions.balance(group, (err, balance, situations) => {
           if(err) { throw err;}
-          bot.sendBalance(message.chat, balance, (err) => {
+          bot.sendBalance(message.chat, balance, situations, (err) => {
             if (err) { throw "unable to send balance" }
             return res.send();
           });

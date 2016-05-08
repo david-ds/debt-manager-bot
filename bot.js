@@ -134,8 +134,12 @@ module.exports = (telegramApi) => {
     telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   }
 
-  response.sendBalance = (chat, balance, callback) => {
-    var text = "";
+  response.sendBalance = (chat, balance, situations, callback) => {
+    var text = "First, where are we ?\n\n";
+    situations.forEach((situation) => {
+      text += situation.user.firstName + " " + situation.amount + "€\n"
+    });
+    text += "\nHow to solve it ?\n";
     if(balance.length === 0) {
       text = "You have nothing to do, everything is ok !";
     } else {
