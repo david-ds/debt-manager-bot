@@ -1,7 +1,11 @@
 var mongoose = require('mongoose');
 var findOneOrCreate = require('mongoose-find-one-or-create');
 
-mongoose.connect('mongodb://mongo/debtmanager');
+
+var mongooseConnection = process.env.OPENSHIFT_MONGODB_DB_URL || "mongodb://mongo/";
+mongooseConnection += process.env.OPENSHIFT_APP_NAME || "debtmanager";
+
+mongoose.connect(mongooseConnection);
 
 var groupSchema = new mongoose.Schema({
   telegramId: Number,

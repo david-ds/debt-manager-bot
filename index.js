@@ -16,7 +16,8 @@ var _ = require('underscore');
 app.use(bodyParser.json());
 
 //telegram connection
-telegramApi.createConnection(process.env.TELEGRAM_TOKEN, process.env.DEBTMANAGERBOT_URL, (err) => {
+var selfUrl = process.env.OPENSHIFT_APP_DNS || process.env.DEBTMANAGERBOT_URL;
+telegramApi.createConnection(process.env.TELEGRAM_TOKEN, selfUrl, (err) => {
   if(err) { throw "Unable to set webhook"}
   console.log('webhook to telegram set');
 });
