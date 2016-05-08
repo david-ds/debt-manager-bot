@@ -89,7 +89,8 @@ module.exports = (telegramApi) => {
     transaction.participants.forEach((participant) => {text += "@" + participant.user.username + ", "});
     text = text.slice(0,-2) + ".\n";
     text += "Did I forgot anyone ? If no, say stop.";
-    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
+    var keyboard = [["stop"]];
+    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   };
 
   response.transactionSummary = (chat, transaction, callback) => {
