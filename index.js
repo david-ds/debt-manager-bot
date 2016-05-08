@@ -121,7 +121,6 @@ app.post('/', (req, res) => {
                 group.currentAction.actionType = "confirmation_transaction";
                 group.currentAction.messageQuestionId = message.id;
                 transactions.getTransaction(group.currentTransaction, (err, transaction) => {
-                  console.log('couocu');
                   bot.transactionSummary(message.chat, transaction, (err) => {
                     if(err) { throw "unable to sum up the transaction";}
                     return res.send();
@@ -135,13 +134,11 @@ app.post('/', (req, res) => {
             group.currentAction.actionType = "confirmation_transaction";
             group.save();
             transactions.getTransaction(group.currentTransaction, (err, transaction) => {
-              console.log('couocu');
               bot.transactionSummary(message.chat, transaction, (err) => {
                 if(err) { throw "unable to sum up the transaction";}
                 return res.send();
               });
             });
-
           }
           else {
             var participants = message.text.split(" ");
@@ -198,13 +195,32 @@ app.post('/', (req, res) => {
           });
         });
       }
+      else if(message.text.indexOf("/transactions") === 0) {
+        transactions.findByGroup(group, (err, transactions) => {
+          if(err) { throw err;}
+          bot.sendTransactions(message.chat, transactions, (err) => {
+            if(err) { throw "unable to send transactions";}
+            return res.send();
+          })
+
+        });
+      }
+      else if(message.text.indexOf("/balance") === 0) {
+        transactions.balance(group, (err, balance) => {
+          if(err) { throw err;}
+          bot.sendBalance(message.chat, balance, (err) => {
+            if (err) { throw "unable to send balance" }
+            return res.send();
+          });
+        });
+      }
       else {
         return res.send();
       }
     });
   });
 
-
+}
 });
 
 app.listen(3000, () => {

@@ -68,5 +68,67 @@ response.getTransaction = (transactionId, callback) => {
   Transaction.findOne({_id: transactionId}, callback);
 }
 
+response.findByGroup = (group, callback) => {
+  Transaction.find({groupId: group._id}).sort({createdAt: -1}).exec(callback);
+}
+
+response.balance = (group, callback) => {
+  Transaction.find({groupId: group._id}, (err, allTransactions) => {
+    if(err) {return callback(err, null);}
+
+    var positiveMembers = [];
+    var negativeMembers = [];
+    var members = {};
+    var situations = {};
+    group.members.forEach((member) => {
+      members[member.telegramId.toString()] = member;
+      situations[member.telegramId.toString()] = 0;
+    });
+    allTransactions.forEach((transaction) => {
+      var totalAmount = 0;
+
+      transaction.creditors.forEach((creditor) => {
+        situations[creditor.user.telegramId.toString()] += creditor.amount;
+        totalAmount += creditor.amount;
+      });
+
+      var averageCost = totalAmount/transaction.participants.length;
+      transaction.participants.forEach((participant) => {
+        situations[participant.user.telegramId.toString()] -= averageCost;
+      });
+    });
+
+    _.each(situations, (amount, telegramId) => {
+      if(amount >= 0) {
+        positiveMembers.push({telegramId: telegramId, amount: amount});
+      } else {
+        negativeMembers.push({telegramId: telegramId, amount: -amount});
+      }
+    });
+
+    positiveMembers = _.sortBy(positiveMembers, (member) => {return -member.amount;});
+    negativeMembers = _.sortBy(negativeMembers, (member) => {return -member.amount;});
+
+    var initialSituations = _.map(situations, (situation) => {return situation;});
+
+    var whatToDo = [];
+
+    _.each(negativeMembers, (negativeMember) => {
+      _.each(positiveMembers, (positiveMember) => {
+        var transactionAmount = Math.min(positiveMember.amount, negativeMember.amount);
+        positiveMember.amount -= transactionAmount;
+        negativeMember.amount -= transactionAmount;
+
+        if(transactionAmount > 0) {
+          whatToDo.push({from: members[negativeMember.telegramId], to: members[positiveMember.telegramId], amount: transactionAmount});
+        }
+      });
+    });
+
+    callback(null, whatToDo);
+  });
+}
+
+
   return response;
 }

@@ -1,4 +1,4 @@
-
+var moment = require('moment');
 
 module.exports = (telegramApi) => {
 
@@ -34,6 +34,7 @@ module.exports = (telegramApi) => {
         text = "Ok, you're not really fun.. I will call you " + name
     }
     text += "\n\nRemember : you type /newtransaction to create a new transaction";
+
     telegramApi.sendMessage(chat.id, text, {}, callback);
   };
 
@@ -77,7 +78,6 @@ module.exports = (telegramApi) => {
 
   response.participantsAdded = (chat, transaction, callback) => {
     var text = "Ok. In my list I have ";
-    console.log(transaction);
     transaction.participants.forEach((participant) => {text += participant.user.firstName + " " + participant.user.lastName + ", "});
     text = text.slice(0,-2) + ".\n";
     text += "Did I forgot anyone ? If no, say stop.";
@@ -113,6 +113,33 @@ module.exports = (telegramApi) => {
 
   response.problemTransaction = (chat, callback) => {
     telegramApi.sendMessage(chat.id, "Well... That's a problem because I can't edit a transaction for now..", {}, callback);
+  }
+
+
+  response.sendTransactions = (chat, transactions, callback) => {
+    var text = "List of the last transactions :\n\n";
+    transactions.forEach((transaction) => {
+      var totalAmount = 0;
+      transaction.creditors.forEach((creditor) => {totalAmount += creditor.amount});
+      text += moment(transaction.createdAt).format('ddd DD MMM');
+      text += " | " + transaction.name + " created by " + transaction.creator.firstName + " " + transaction.creator.lastName.substr(0,1) + " | " + totalAmount + "€";
+      text += "\n";
+    });
+
+    telegramApi.sendMessage(chat.id, text, {}, callback);
+  }
+
+  response.sendBalance = (chat, balance, callback) => {
+    var text = "";
+    if(balance.length === 0) {
+      text = "You have nothing to do, everything is ok !";
+    } else {
+      balance.forEach((operation) => {
+        text += operation.from.username + " give " + operation.amount + "€ to " + operation.to.username;
+      });
+    }
+
+    telegramApi.sendMessage(chat.id, text, {}, callback);
   }
   return response;
 }
