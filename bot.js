@@ -35,7 +35,8 @@ module.exports = (telegramApi) => {
     }
     text += "\n\nRemember : you type /newtransaction to create a new transaction";
 
-    telegramApi.sendMessage(chat.id, text, {}, callback);
+    var keyboard = [["/newtransaction", "/transactions", "/balance"]];
+    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   };
 
   response.createdEmptyTransaction = (chat, callback) => {
@@ -66,7 +67,8 @@ module.exports = (telegramApi) => {
 
   response.askForFirstParticipant = (chat, callback) => {
     var text = "Alright. Now, who participated in ? You can tell me the names this way : @BarackObama @QueenElisabeth or anwser \"everybody\"";
-    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
+    var keyboard = [["everybody"]];
+    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   }
 
   response.everyoneHadParticipated = (chat, groupMembers, callback) => {
@@ -103,12 +105,14 @@ module.exports = (telegramApi) => {
 
     var keyboard = [["Yes", "No"]];
 
-    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, "one_time_keyboard": true}, callback);
+    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, "one_time_keyboard": true, resize_keyboard: true}, callback);
   };
 
 
   response.endTransaction = (chat, callback) => {
-    telegramApi.sendMessage(chat.id, "Ok, well done ! Type /balance to pay your debts or /transactions to see the last transactions", {}, callback);
+    var keyboard = [["/newtransaction", "/transactions", "/balance"]];
+
+    telegramApi.sendMessage(chat.id, "Ok, well done ! Type /balance to pay your debts or /transactions to see the last transactions", {keyboard: keyboard, resize_keyboard: true}, callback);
   }
 
   response.problemTransaction = (chat, callback) => {
@@ -125,8 +129,9 @@ module.exports = (telegramApi) => {
       text += " | " + transaction.name + " created by " + transaction.creator.firstName + " " + transaction.creator.lastName.substr(0,1) + " | " + totalAmount + "€";
       text += "\n";
     });
+    var keyboard = [["/newtransaction", "/transactions", "/balance"]];
 
-    telegramApi.sendMessage(chat.id, text, {}, callback);
+    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   }
 
   response.sendBalance = (chat, balance, callback) => {
@@ -138,8 +143,9 @@ module.exports = (telegramApi) => {
         text += operation.from.username + " give " + operation.amount + "€ to " + operation.to.username;
       });
     }
+    var keyboard = [["/newtransaction", "/transactions", "/balance"]];
 
-    telegramApi.sendMessage(chat.id, text, {}, callback);
+    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   }
   return response;
 }
