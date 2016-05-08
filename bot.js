@@ -165,7 +165,7 @@ module.exports = (telegramApi) => {
 
 
   response.showTransaction = (chat, transaction, callback) => {
-    var text = transaction.name + " created by @" + transaction.creator.username + " on " + moment(transaction.createdAt).format('DD MM YYY');
+    var text = transaction.name + " created by @" + transaction.creator.username + " on " + moment(transaction.createdAt).format('ddd DD MMM');
     text += "\n\nWho paid ?\n";
     transaction.creditors.forEach((creditor) => {
       text += "@" + creditor.user.username  + " : " + creditor.amount + "€";
