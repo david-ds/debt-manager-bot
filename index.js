@@ -30,16 +30,18 @@ app.post('/', (req, res) => {
 
   var privateMessage = message.chat.type === "private";
 
-  if(message.text === "/start" && privateMessage) {
-    bot.sayHello(message.from, (err) => {
-      if(err) { console.error('cannot say hello personally');}
-      return res.send();
-    });
-  }
-
   if(privateMessage) {
-    return res.send();
+    if(message.text.indexOf("/start") === 0) {
+      bot.sayHello(message.from, (err) => {
+        if(err) { console.error('cannot say hello personally');}
+        return res.send();
+      });
+    }
+    else {
+      return res.send();
+    }
   }
+  else {
 
   //Get the current group
   users.findOrCreateGroup(message.chat, (group) => {
@@ -156,20 +158,22 @@ app.post('/', (req, res) => {
           if(message.text === "Yes") {
             bot.endTransaction(message.chat, (err) => {
               if(err) { throw "unable to say end of transaction"};
-              group.currentAction.actionType = "";
-              group.currentAction.messageQuestionId = 0;
+              group.currentAction.actionType = null;
+              group.currentAction.messageQuestionId = null;
               group.currentTransaction = null;
               group.save();
+              return res.send();
             });
           }
           else {
             bot.problemTransaction(message.chat, (err) => {
               if(err) { throw "unable to say end of transaction"};
-              group.currentAction.actionType = "";
-              group.currentAction.messageQuestionId = 0;
+              group.currentAction.actionType = null;
+              group.currentAction.messageQuestionId = null;
               group.currentTransaction = null;
               group.save();
-            })
+              return res.send();
+            });
           }
         }
       }
@@ -184,7 +188,7 @@ app.post('/', (req, res) => {
           return res.send();
         });
       }
-      if(message.text.indexOf("/newtransaction") === 0) {
+      else if(message.text.indexOf("/newtransaction") === 0) {
         transactions.createEmpty(message.from, group, (err) => {
           if(err) { console.error('cannot create transaction');}
           bot.createdEmptyTransaction(message.chat, (err) => {
