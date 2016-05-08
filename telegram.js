@@ -19,6 +19,7 @@ module.exports = () => {
     var data = {url: urlWebhook};
     this.sendRequest('setWebhook', data, (err, response, body) => {
       callback(err);
+      console.log('telegram connection to ' + urlWebhook + ' : ', body);
     });
   };
 
