@@ -117,7 +117,8 @@ module.exports = (telegramApi) => {
   }
 
   response.problemTransaction = (chat, callback) => {
-    telegramApi.sendMessage(chat.id, "Well... That's a problem because I can't edit a transaction for now..", {}, callback);
+    var keyboard = [["Yes"]];
+    telegramApi.sendMessage(chat.id, "Well... That's a problem because I can't edit a transaction for now.. Please say Yes", {keyboard: keyboard, resize_keyboard: true}, callback);
   }
 
 

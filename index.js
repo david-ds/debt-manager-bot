@@ -168,10 +168,8 @@ app.post('/', (req, res) => {
           }
           else {
             bot.problemTransaction(message.chat, (err) => {
-              if(err) { throw "unable to say end of transaction"};
-              group.currentAction.actionType = null;
-              group.currentAction.messageQuestionId = null;
-              group.currentTransaction = null;
+              if(err) { throw "unable to say end of transaction"}
+                  group.currentAction.messageQuestionId = message.id;
               group.save();
               return res.send();
             });
