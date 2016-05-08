@@ -51,14 +51,14 @@ module.exports = (telegramApi) => {
   }
 
   response.sayInvalidCreditor = (chat, callback) => {
-    var text = "Sorry :/ I don't get it. Please tell me the new creditors in the format '@pseudo 10.0'";
+    var text = "Sorry :/ I don't get it. Maybe I don't know this username or I don't recognize the amount. Please tell me the new creditors in the format '@pseudo 10.0'";
     telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
   }
 
   response.askForCreditor = (chat, transaction, callback) => {
     var text = "Ok, I get it. For now I have :\n";
     transaction.creditors.forEach((creditor) => {
-      text += creditor.user.firstName + " paid " + creditor.amount + "€\n"
+      text += "@" + creditor.user.username + " paid " + creditor.amount + "€\n"
     });
     text += "Who else ? When you're done, say stop";
 
@@ -74,14 +74,14 @@ module.exports = (telegramApi) => {
 
   response.everyoneHadParticipated = (chat, groupMembers, callback) => {
     var text = "Ok, I added ";
-    groupMembers.forEach((member) => { text += member.firstName + " " + member.lastName.substr(0,1) + ","});
+    groupMembers.forEach((member) => { text += "@" + member.username + ","});
     text = text.slice(0,-1) + ".";
     telegramApi.sendMessage(chat.id, text, {}, callback);
   }
 
   response.participantsAdded = (chat, transaction, callback) => {
     var text = "Ok. In my list I have ";
-    transaction.participants.forEach((participant) => {text += participant.user.firstName + " " + participant.user.lastName + ", "});
+    transaction.participants.forEach((participant) => {text += "@" + participant.user.username + ", "});
     text = text.slice(0,-2) + ".\n";
     text += "Did I forgot anyone ? If no, say stop.";
     telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
@@ -89,16 +89,16 @@ module.exports = (telegramApi) => {
 
   response.transactionSummary = (chat, transaction, callback) => {
     var text = "Ok, I think I've got everything I need. Let's sum up this :\n"
-    text += transaction.creator.firstName + " " + transaction.creator.lastName.substr(0,1) + " created " + transaction.name + "\n";
+    text += "@" + transaction.creator.username  + " created " + transaction.name + "\n";
     text += "\nThe creditors are :\n";
     var totalAmount = 0;
     transaction.creditors.forEach((creditor) => {
-      text += creditor.user.firstName + " " + creditor.user.lastName + " (" + creditor.amount + ")\n";
+      text += "@" + creditor.user.username + " (" + creditor.amount + "€)\n";
       totalAmount += creditor.amount});
 
     text += "\nThe participants are :\n";
     transaction.participants.forEach((participant) => {
-      text += participant.user.firstName + " " + participant.user.lastName + "\n";
+      text += "@" + participant.user.username + "\n";
     });
     text += "\n";
     text += "Do you confirm it ?";
@@ -132,7 +132,7 @@ module.exports = (telegramApi) => {
         var totalAmount = 0;
         transaction.creditors.forEach((creditor) => {totalAmount += creditor.amount});
         text += moment(transaction.createdAt).format('ddd DD MMM');
-        text += " | " + transaction.name + " created by " + transaction.creator.firstName + " " + transaction.creator.lastName.substr(0,1) + " | " + totalAmount + "€";
+        text += " | " + transaction.name + " created by @" + transaction.creator.username  + " | " + totalAmount + "€";
         text += " | /show" + transaction._id;
         text += "\n";
       });
@@ -145,14 +145,14 @@ module.exports = (telegramApi) => {
   response.sendBalance = (chat, balance, situations, callback) => {
     var text = "First, where are we ?\n\n";
     situations.forEach((situation) => {
-      text += situation.user.firstName + " " + situation.user.lastName.substr(0,1) + " ( @" + situation.user.username + " ) " + situation.amount + "€\n"
+      text += "@" + situation.user.username + " " + situation.amount + "€\n"
     });
     text += "\nHow to solve it ?\n";
     if(balance.length === 0) {
       text = "You have nothing to do, everything is ok !";
     } else {
       balance.forEach((operation) => {
-        text += operation.from.firstName + " " + operation.from.lastName.substr(0,1) + " give " + operation.amount + "€ to " + operation.to.firstName + " " + operation.to.lastName.substr(0,1);
+        text += "@" + operation.from.username  + " give " + operation.amount + "€ to @" + operation.to.username;
         text += "\n";
       });
     }
@@ -163,16 +163,16 @@ module.exports = (telegramApi) => {
 
 
   response.showTransaction = (chat, transaction, callback) => {
-    var text = transaction.name + " created by " + transaction.creator.firstName + " on " + moment(transaction.createdAt).format('DD MM YYY');
+    var text = transaction.name + " created by @" + transaction.creator.username + " on " + moment(transaction.createdAt).format('DD MM YYY');
     text += "\n\nWho paid ?\n";
     transaction.creditors.forEach((creditor) => {
-      text += creditor.user.firstName + " " + creditor.user.lastName.substr(0,1) + " : " + creditor.amount + "€";
+      text += "@" + creditor.user.username  + " : " + creditor.amount + "€";
       text += "\n";
     });
 
     text += "\nWho participated in ?\n";
     transaction.participants.forEach((participant) => {
-      text += participant.user.firstName + " " + participant.user.lastName.substr(0,1) + "\n";
+      text += "@" + participant.user.username + "\n";
     });
     telegramApi.sendMessage(chat.id, text, {}, callback);
   }
