@@ -233,6 +233,12 @@ app.post('/', (req, res) => {
           })
         });
       }
+      else if(message.text.indexOf("/help") === 0) {
+        bot.displayHelp(message.chat, group, (err) => {
+          if(err) { throw "unable to display help";}
+          return res.send();
+        })
+      }
       else {
         return res.send();
       }

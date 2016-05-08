@@ -3,7 +3,12 @@ var moment = require('moment');
 module.exports = (telegramApi) => {
 
   var response = {};
-  var jokeAboutGroupName = "Camping 2016"
+  var jokeAboutGroupName = "Camping 2016";
+
+  var standardKeyboard = {
+    keyboard : [["/newtransaction", "/transactions", "/balance"]],
+    resize_keyboard: true
+  }
 
   response.sayHello = function(to, callback) {
     var text = "Hello There ! Nice to meet you " + to.first_name + ".\n";
@@ -36,7 +41,7 @@ module.exports = (telegramApi) => {
     text += "\n\nRemember : you type /newtransaction to create a new transaction";
 
     var keyboard = [["/newtransaction", "/transactions", "/balance"]];
-    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
+    telegramApi.sendMessage(chat.id, text, standardKeyboard, callback);
   };
 
   response.createdEmptyTransaction = (chat, callback) => {
@@ -111,9 +116,7 @@ module.exports = (telegramApi) => {
 
 
   response.endTransaction = (chat, callback) => {
-    var keyboard = [["/newtransaction", "/transactions", "/balance"]];
-
-    telegramApi.sendMessage(chat.id, "Ok, well done ! Type /balance to pay your debts or /transactions to see the last transactions", {keyboard: keyboard, resize_keyboard: true}, callback);
+    telegramApi.sendMessage(chat.id, "Ok, well done ! Type /balance to pay your debts or /transactions to see the last transactions", standardKeyboard, callback);
   }
 
   response.problemTransaction = (chat, callback) => {
@@ -157,9 +160,7 @@ module.exports = (telegramApi) => {
         text += "\n";
       });
     }
-    var keyboard = [["/newtransaction", "/transactions", "/balance"]];
-
-    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
+    telegramApi.sendMessage(chat.id, text, standardKeyboard, callback);
   }
 
 
@@ -176,6 +177,15 @@ module.exports = (telegramApi) => {
       text += "@" + participant.user.username + "\n";
     });
     telegramApi.sendMessage(chat.id, text, {}, callback);
+  }
+
+  response.displayHelp = (chat, group, callback) => {
+    var text = "Hello " + (group.name || "Anonymous")+ "\n";
+    text += "/newtransaction : create a new transaction\n";
+    text += "/transactions : list the last transactions\n";
+    text += "/balance : show who must pay who\n";
+
+    telegramApi.sendMessage(chat.id, text, standardKeyboard, callback);
   }
   return response;
 
