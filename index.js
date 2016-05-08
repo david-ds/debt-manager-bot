@@ -131,7 +131,7 @@ app.post('/', (req, res) => {
                     return res.send();
                   });
                 });
-              })
+              });
             });
           }
           else if(message.text === "stop") {

@@ -134,7 +134,7 @@ module.exports = (telegramApi) => {
     else {
       transactions.forEach((transaction) => {
         var totalAmount = 0;
-        transaction.creditors.forEach((creditor) => {totalAmount += creditor.amount});
+        transaction.creditors.forEach((creditor) => {totalAmount += parseFloat(creditor.amount.toFixed(2))});
         text += moment(transaction.createdAt).format('ddd DD MMM');
         text += " | " + transaction.name + " created by @" + transaction.creator.username  + " | " + totalAmount + "€";
         text += " | /show" + transaction._id;
@@ -149,14 +149,14 @@ module.exports = (telegramApi) => {
   response.sendBalance = (chat, balance, situations, callback) => {
     var text = "First, where are we ?\n\n";
     situations.forEach((situation) => {
-      text += "@" + situation.user.username + " " + situation.amount + "€\n"
+      text += "@" + situation.user.username + " " + parseFloat(situation.amount.toFixed(2)) + "€\n"
     });
     text += "\nHow to solve it ?\n";
     if(balance.length === 0) {
       text = "You have nothing to do, everything is ok !";
     } else {
       balance.forEach((operation) => {
-        text += "@" + operation.from.username  + " give " + operation.amount + "€ to @" + operation.to.username;
+        text += "@" + operation.from.username  + " give " + parseFloat(operation.amount.toFixed(2)) + "€ to @" + operation.to.username;
         text += "\n";
       });
     }
@@ -168,7 +168,7 @@ module.exports = (telegramApi) => {
     var text = transaction.name + " created by @" + transaction.creator.username + " on " + moment(transaction.createdAt).format('ddd DD MMM');
     text += "\n\nWho paid ?\n";
     transaction.creditors.forEach((creditor) => {
-      text += "@" + creditor.user.username  + " : " + creditor.amount + "€";
+      text += "@" + creditor.user.username  + " : " + parseFloat(creditor.amount.toFixed(2)) + "€";
       text += "\n";
     });
 
