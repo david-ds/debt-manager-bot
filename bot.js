@@ -3,7 +3,7 @@ var moment = require('moment');
 module.exports = (telegramApi) => {
 
   var response = {};
-  var jokeAboutGroupName = "One Direction Fans"
+  var jokeAboutGroupName = "Camping 2016"
 
   response.sayHello = function(to, callback) {
     var text = "Hello There ! Nice to meet you " + to.first_name + ".\n";
@@ -31,7 +31,7 @@ module.exports = (telegramApi) => {
       text = "Oh you listen to me <3 Your name is now " + jokeAboutGroupName;
     }
     else {
-        text = "Ok, you're not really fun.. I will call you " + name
+        text = "Ok, I got it " + name
     }
     text += "\n\nRemember : you type /newtransaction to create a new transaction";
 
@@ -62,11 +62,12 @@ module.exports = (telegramApi) => {
     });
     text += "Who else ? When you're done, say stop";
 
-    telegramApi.sendMessage(chat.id, text, {"force_reply": true}, callback);
+    var keyboard = [["stop"]];
+    telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   }
 
   response.askForFirstParticipant = (chat, callback) => {
-    var text = "Alright. Now, who participated in ? You can tell me the names this way : @BarackObama @QueenElisabeth or anwser \"everybody\"";
+    var text = "Alright. Now, who participated in ? You can tell me the names this way : \"@BarackObama @QueenElisabeth\" or anwser \"everybody\"";
     var keyboard = [["everybody"]];
     telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   }
@@ -121,14 +122,21 @@ module.exports = (telegramApi) => {
 
 
   response.sendTransactions = (chat, transactions, callback) => {
+
     var text = "List of the last transactions :\n\n";
-    transactions.forEach((transaction) => {
-      var totalAmount = 0;
-      transaction.creditors.forEach((creditor) => {totalAmount += creditor.amount});
-      text += moment(transaction.createdAt).format('ddd DD MMM');
-      text += " | " + transaction.name + " created by " + transaction.creator.firstName + " " + transaction.creator.lastName.substr(0,1) + " | " + totalAmount + "€";
-      text += "\n";
-    });
+    if (transactions.length === 0) {
+      text = "No transactions for the moment :/";
+    }
+    else {
+      transactions.forEach((transaction) => {
+        var totalAmount = 0;
+        transaction.creditors.forEach((creditor) => {totalAmount += creditor.amount});
+        text += moment(transaction.createdAt).format('ddd DD MMM');
+        text += " | " + transaction.name + " created by " + transaction.creator.firstName + " " + transaction.creator.lastName.substr(0,1) + " | " + totalAmount + "€";
+        text += " | /show" + transaction._id;
+        text += "\n";
+      });
+    }
     var keyboard = [["/newtransaction", "/transactions", "/balance"]];
 
     telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
@@ -137,19 +145,38 @@ module.exports = (telegramApi) => {
   response.sendBalance = (chat, balance, situations, callback) => {
     var text = "First, where are we ?\n\n";
     situations.forEach((situation) => {
-      text += situation.user.firstName + " " + situation.amount + "€\n"
+      text += situation.user.firstName + " " + situation.user.lastName.substr(0,1) + " ( @" + situation.user.username + " ) " + situation.amount + "€\n"
     });
     text += "\nHow to solve it ?\n";
     if(balance.length === 0) {
       text = "You have nothing to do, everything is ok !";
     } else {
       balance.forEach((operation) => {
-        text += operation.from.username + " give " + operation.amount + "€ to " + operation.to.username;
+        text += operation.from.firstName + " " + operation.from.lastName.substr(0,1) + " give " + operation.amount + "€ to " + operation.to.firstName + " " + operation.to.lastName.substr(0,1);
+        text += "\n";
       });
     }
     var keyboard = [["/newtransaction", "/transactions", "/balance"]];
 
     telegramApi.sendMessage(chat.id, text, {keyboard: keyboard, resize_keyboard: true}, callback);
   }
+
+
+  response.showTransaction = (chat, transaction, callback) => {
+    var text = transaction.name + " created by " + transaction.creator.firstName + " on " + moment(transaction.createdAt).format('DD MM YYY');
+    text += "\n\nWho paid ?\n";
+    transaction.creditors.forEach((creditor) => {
+      text += creditor.user.firstName + " " + creditor.user.lastName.substr(0,1) + " : " + creditor.amount + "€";
+      text += "\n";
+    });
+
+    text += "\nWho participated in ?\n";
+    transaction.participants.forEach((participant) => {
+      text += participant.user.firstName + " " + participant.user.lastName.substr(0,1) + "\n";
+    });
+    telegramApi.sendMessage(chat.id, text, {}, callback);
+  }
   return response;
+
+
 }

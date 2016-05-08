@@ -219,6 +219,20 @@ app.post('/', (req, res) => {
           });
         });
       }
+      else if(message.text.indexOf("/show") === 0) {
+        var transactionId = message.text.substr(5);
+        var indexOfAt = transactionId.indexOf("@");
+        if(indexOfAt > 0) {
+          transactionId = transactionId.substring(0,indexOfAt);
+        }
+        transactions.findById(transactionId, (err, transaction) => {
+          if(err) { throw "unable to find transaction"}
+          bot.showTransaction(message.chat, transaction, (err) => {
+            if(err) { throw "unable to send transaction"}
+            return res.send();
+          })
+        });
+      }
       else {
         return res.send();
       }

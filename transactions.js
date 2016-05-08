@@ -105,7 +105,7 @@ response.balance = (group, callback) => {
         amount: situations[member.telegramId]
       });
     });
-    
+
     _.each(situations, (amount, telegramId) => {
       if(amount >= 0) {
         positiveMembers.push({telegramId: telegramId, amount: amount});
@@ -135,6 +135,10 @@ response.balance = (group, callback) => {
 
     callback(null, whatToDo, initialSituations, members);
   });
+}
+
+response.findById = (transactionId, callback) => {
+  Transaction.findOne({_id: transactionId}, callback);
 }
 
 
